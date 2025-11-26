@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رسم فنی حرفه‌ای: نمای مایل و سه نما</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Vazir', sans-serif;
+        }
+        
+        body {
+            background-color: #F2F3F4;
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-bottom: 3px solid #4285F4;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #4285F4;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+
+        /* Input Section */
+        .controls-panel {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background-color: #f9f9f9;
+        }
+        
+        input:focus {
+            border-color: #4285F4;
+            background-color: #fff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+        }
+        
+        button {
+            background: linear-gradient(135deg, #4285F4, #2b6cb0);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(66, 133, 244, 0.3);
+        }
+
+        /* Canvas Section */
+        .drawing-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .canvas-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        .card-title {
+            font-weight: bold;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge {
+            background: #e8f0fe;
+            color: #4285F4;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        canvas {
+            width: 100%;
+            height: auto;
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            cursor: crosshair;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .canvas-card {
+                padding: 15px;
+            }
+        }
+
+        .unit-label {
+            position: absolute;
+            left: 15px;
+            top: 42px;
+            color: #999;
+            font-size: 0.8rem;
+            pointer-events: none;
+        }
+        
+        .footer-info {
+            position: absolute;
+            bottom: 5px;
+            right: 15px;
+            font-size: 0.8rem;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-drafting-compass"></i> رسم فنی: نمای مایل (Oblique) و سه نما</h1>
+            <p class="subtitle">مولد خودکار نقشه‌های استاندارد مهندسی با زاویه ۴۵ درجه و مقیاس ۵mm</p>
+        </header>
+        
+        <div class="main-grid">
+            <!-- Controls -->
+            <div class="controls-panel">
+                <h3 style="margin-bottom: 20px; color: #4285F4;">ابعاد قطعه</h3>
+                
+                <div class="input-group">
+                    <label for="length">طول (L)</label>
+                    <input type="number" id="length" value="60" min="10">
+                    <span class="unit-label">mm</span>
+                </div>
+                
+                <div class="input-group">
+                    <label for="width">بعد (D)</label>
+                    <input type="number" id="width" value="40" min="10">
+                    <span class="unit-label">mm</span>
+                </div>
+                
+                <div class="input-group">
+                    <label for="height">ارتفاع (H)</label>
+                    <input type="number" id="height" value="50" min="10">
+                    <span class="unit-label">mm</span>
+                </div>
+                
+                <div style="margin: 20px 0; padding: 15px; background: #e8f0fe; border-radius: 8px; font-size: 0.9rem; border-right: 3px solid #4285F4;">
+                    <i class="fas fa-info-circle" style="color: #4285F4;"></i>
+                    مقیاس: هر خانه شطرنجی معادل **۵ میلی‌متر** است. عمق در نمای مایل با ضریب **۰.۵** رسم می‌شود.
+                </div>
+
+                <button id="drawBtn" onclick="drawAll()">
+                    <i class="fas fa-pen-ruler"></i>
+                    رسم نقشه
+                </button>
+            </div>
+
+            <!-- Drawings -->
+            <div class="drawing-area">
+                <!-- Oblique View -->
+                <div class="canvas-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-cube" style="color: #EA4335;"></i>
+                            نمای سه بعدی مایل (Oblique)
+                        </div>
+                        <span class="badge">نمای جانبی راست</span>
+                    </div>
+                    <canvas id="isoCanvas" width="600" height="400"></canvas>
+                    <div class="footer-info">
+                        رسم شده توسط: مهندس علی اکبر رستگاری مهر
+                    </div>
+                </div>
+
+                <!-- Orthographic Views -->
+                <div class="canvas-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-th-large" style="color: #34A853;"></i>
+                            سه نما (رنگی)
+                        </div>
+                        <span class="badge">زاویه اول (First Angle) + مقیاس ۵mm</span>
+                    </div>
+                    <canvas id="orthoCanvas" width="600" height="500"></canvas>
+                    <div class="footer-info">
+                        آدرس سایت: https://rama-company.github.io/aliakbar/
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Canvas Contexts
+        const isoCanvas = document.getElementById('isoCanvas');
+        const isoCtx = isoCanvas.getContext('2d');
+        const orthoCanvas = document.getElementById('orthoCanvas');
+        const orthoCtx = orthoCanvas.getContext('2d');
+        
+        // Fixed grid size requested by user (5mm)
+        const GRID_SIZE = 5; 
+        const RED = '#EA4335'; // Front
+        const BLUE = '#4285F4'; // Top
+        const YELLOW = '#FBBC05'; // Side
+        
+        // Oblique Dimension Scale Factor (0.5 for Oblique Cavalier / Technical Drawing Standard)
+        const OBLIQUE_SCALE_FACTOR = 0.5; 
+
+        // Initial Draw
+        window.onload = drawAll;
+
+        function drawAll() {
+            const L = parseFloat(document.getElementById('length').value);
+            const D = parseFloat(document.getElementById('width').value); // Dimension (Depth)
+            const H = parseFloat(document.getElementById('height').value);
+
+            if (isNaN(L) || isNaN(D) || isNaN(H) || L <= 0 || D <= 0 || H <= 0) {
+                console.error('لطفاً ابعاد معتبر وارد کنید.');
+                return;
+            }
+
+            drawOblique(L, D, H);
+            drawOrthographic(L, D, H);
+        }
+
+        // --- Drawing Helper Functions ---
+        function clearCanvas(canvas, ctx) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Updated drawArrow to emphasize 5mm grid calculation and clarify dimension text
+        function drawArrow(ctx, x1, y1, x2, y2, dimension, numSquares, isVertical = false) {
+            const headlen = 8;
+            const angle = Math.atan2(y2 - y1, x2 - x1);
+            const text = `${dimension}`;
+            // Use Math.round to fix display issues with floating point arithmetic in the drawing
+            const squaresText = ` (${(Math.round(numSquares * 100) / 100).toFixed(2)} خانه)`;
+            
+            ctx.save();
+            ctx.strokeStyle = '#000';
+            ctx.fillStyle = '#000';
+            ctx.lineWidth = 1;
+
+            // Extension lines (from dimension line to the object) - short lines perpendicular to the dimension line
+            const tickLength = 5;
+            const perpAngle = angle + Math.PI / 2;
+            
+            // Draw extension lines perpendicular to the dimension line
+            ctx.beginPath();
+            
+            // Start extension line
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x1 + tickLength * Math.cos(perpAngle), y1 + tickLength * Math.sin(perpAngle));
+            
+            // End extension line
+            ctx.moveTo(x2, y2);
+            ctx.lineTo(x2 + tickLength * Math.cos(perpAngle), y2 + tickLength * Math.sin(perpAngle));
+            
+            ctx.stroke();
+
+            // Dimension Line (slightly offset from the extension line)
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+
+            // Arrowheads
+            ctx.beginPath();
+            // Arrowhead at x1
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x1 + headlen * Math.cos(angle + Math.PI / 6), y1 + headlen * Math.sin(angle + Math.PI / 6));
+            ctx.lineTo(x1 + headlen * Math.cos(angle - Math.PI / 6), y1 + headlen * Math.sin(angle - Math.PI / 6));
+            ctx.fill();
+
+            // Arrowhead at x2
+            ctx.beginPath();
+            ctx.moveTo(x2, y2);
+            ctx.lineTo(x2 - headlen * Math.cos(angle - Math.PI / 6), y2 - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(x2 - headlen * Math.cos(angle + Math.PI / 6), y2 + headlen * Math.sin(angle + Math.PI / 6));
+            ctx.fill();
+
+            // Text rendering (Dimension + unit + squares)
+            if (text) {
+                const midX = (x1 + x2) / 2;
+                const midY = (y1 + y2) / 2;
+                
+                ctx.font = 'bold 12px Vazir, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                const unit = 'mm';
+                // Create the full text string to measure
+                const fullText = `${text} ${unit} ${squaresText}`;
+                
+                // Measure parts for background box
+                const metrics = ctx.measureText(fullText);
+                
+                // Draw white background
+                ctx.fillStyle = 'rgba(255,255,255,0.85)';
+                let textX = midX;
+                let textY = midY;
+                let boxWidth = metrics.width + 10; // Padding
+
+                // Handle vertical text rotation
+                if (isVertical) {
+                    ctx.save();
+                    ctx.translate(midX, midY);
+                    ctx.rotate(-Math.PI / 2); 
+                    textX = 0;
+                    textY = 0;
+                }
+
+                ctx.fillRect(textX - boxWidth/2, textY - 10, boxWidth, 20);
+                
+                // Draw text segments (Dimension, Unit, Squares)
+                let currentX = textX - metrics.width / 2;
+                
+                // 1. Dimension (L, D, or H)
+                ctx.fillStyle = RED;
+                let dimMetrics = ctx.measureText(text);
+                ctx.fillText(text, currentX + dimMetrics.width/2, textY);
+                currentX += dimMetrics.width;
+                
+                // 2. Unit (mm) and Squares
+                ctx.fillStyle = '#333';
+                let unitSquaresText = ` ${unit} ${squaresText}`;
+                let unitSquaresMetrics = ctx.measureText(unitSquaresText);
+                ctx.fillText(unitSquaresText, currentX + unitSquaresMetrics.width/2, textY);
+
+                if (isVertical) {
+                    ctx.restore();
+                }
+            }
+            ctx.restore();
+        }
+
+        // --- Grid Drawing Function (For Oblique View - 5mm Steps) ---
+        function drawObliqueGrid(ctx, scale, L, D, H, origins) {
+            ctx.save();
+            ctx.strokeStyle = '#DCDCDC'; /* Changed to a slightly darker gray */
+            ctx.lineWidth = 0.5;
+            const step = GRID_SIZE * scale; 
+            const angleRad = Math.PI / 4;
+            const originX = origins.originX;
+            const baseY = origins.baseY;
+
+            // Helper for 45 deg projection with 0.5 scale
+            function obliqueGridProject(x, y, z) {
+                // x is L (horizontal), y is H (vertical), z is D (depth 45 deg)
+                // z * OBLIQUE_SCALE_FACTOR is applied here
+                const px = originX + x * scale - (z * OBLIQUE_SCALE_FACTOR * Math.cos(angleRad) * scale); // Recedes LEFT
+                const py = baseY - y * scale - (z * OBLIQUE_SCALE_FACTOR * Math.sin(angleRad) * scale); // Recedes UP
+                return { x: px, y: py };
+            }
+
+            // Draw grid in 3 planes
+            
+            // 1. Lines parallel to H (Vertical) - on L-H and D-H planes
+            for (let i = 0; i <= L; i += GRID_SIZE) {
+                // Lines parallel to H (x=i, 45 deg depth)
+                const start = obliqueGridProject(i, 0, 0);
+                const end = obliqueGridProject(i, H, 0);
+                const backEnd = obliqueGridProject(i, H, D); // For top grid (L-D plane at y=H)
+                
+                // Vertical lines on front face
+                ctx.beginPath();
+                ctx.moveTo(start.x, start.y);
+                ctx.lineTo(end.x, end.y);
+                ctx.stroke();
+
+                // Receding lines (parallel to D) from top edge (L-D plane)
+                ctx.beginPath();
+                ctx.moveTo(end.x, end.y);
+                ctx.lineTo(backEnd.x, backEnd.y);
+                ctx.stroke();
+            }
+
+            // 2. Lines parallel to L (Horizontal) - on L-H and L-D planes
+            for (let j = 0; j <= H; j += GRID_SIZE) {
+                // Lines parallel to L (y=j, 45 deg depth)
+                const start = obliqueGridProject(0, j, 0);
+                const end = obliqueGridProject(L, j, 0);
+                const backEnd = obliqueGridProject(L, j, D); // For side grid (D-H plane at x=L)
+
+                // Horizontal lines on front face
+                ctx.beginPath();
+                ctx.moveTo(start.x, start.y);
+                ctx.lineTo(end.x, end.y);
+                ctx.stroke();
+                
+                // Receding lines (parallel to D) from right edge (D-H plane)
+                ctx.beginPath();
+                ctx.moveTo(start.x, start.y);
+                ctx.lineTo(obliqueGridProject(0, j, D).x, obliqueGridProject(0, j, D).y);
+                ctx.stroke();
+            }
+
+            // 3. Draw grid lines on back face (D-H and L-D planes)
+            // Lines parallel to H (Vertical) on back face (L, D, H)
+            for (let i = 0; i <= D; i += GRID_SIZE) {
+                const lineX = L;
+                const lineZ = i;
+                const start = obliqueGridProject(lineX, 0, lineZ);
+                const end = obliqueGridProject(lineX, H, lineZ);
+                
+                // Vertical lines on side D-H face (for D lines)
+                ctx.beginPath();
+                ctx.moveTo(start.x, start.y);
+                ctx.lineTo(end.x, end.y);
+                ctx.stroke();
+
+                // Horizontal lines on back L-D face (for D lines)
+                const startH = obliqueGridProject(0, H, i);
+                const endH = obliqueGridProject(L, H, i);
+                ctx.beginPath();
+                ctx.moveTo(startH.x, startH.y);
+                ctx.lineTo(endH.x, endH.y);
+                ctx.stroke();
+            }
+
+            ctx.restore();
+        }
+
+        // --- Oblique Drawing Logic (Up-Left Recession for Mirrored View) ---
+        function drawOblique(L, D, H) {
+            clearCanvas(isoCanvas, isoCtx);
+            const ctx = isoCtx;
+            
+            const angleRad = Math.PI / 4; // 45 degrees
+            
+            // Apply 0.5 scaling to D for Oblique drawing
+            const D_scaled = D * OBLIQUE_SCALE_FACTOR;
+            
+            // Calculate the total projected dimensions for the oblique view
+            const projectedW = L + D_scaled * Math.cos(angleRad);
+            const projectedH = H + D_scaled * Math.sin(angleRad);
+            
+            // Calculate scale to fit within canvas borders (padding 50 pixels)
+            const padding = 50;
+            const scale = Math.min(
+                (isoCanvas.width - 2 * padding) / projectedW,
+                (isoCanvas.height - 2 * padding) / projectedH
+            );
+            
+            // Recalculate scaled dimensions
+            const Ls = L * scale;
+            const Hs = H * scale;
+            const Ds = D_scaled * scale;
+
+            // Calculate the starting point (originX, baseY) to center the shape
+            // (0, 0, 0) is the Bottom-Right-Front point (p0)
+            
+            // 1. X-Axis Centering:
+            // Extreme Left X (P4/P5/P6/P7): -Ds * cos(45)
+            const minXRelative = -Ds * Math.cos(angleRad); 
+            const maxXRelative = Ls; 
+            
+            const centerX = isoCanvas.width / 2;
+            const centerPointRelativeX = (maxXRelative + minXRelative) / 2;
+            const originX = centerX - centerPointRelativeX;
+
+
+            // 2. Y-Axis Centering:
+            // Highest Point Y (P6/P7): -Hs - Ds * sin(45) (lowest y value)
+            const minYRelative = -Hs - Ds * Math.sin(angleRad); 
+            const maxYRelative = 0; 
+            
+            const centerY = isoCanvas.height / 2;
+            const centerPointYRelative = (maxYRelative + minYRelative) / 2;
+            const baseY = centerY - centerPointYRelative;
+
+
+            const origins = { originX, baseY };
+            
+            // Draw the 5mm Grid
+            drawObliqueGrid(ctx, scale, L, D, H, origins);
+
+            // Helper for 45 deg projection with 0.5 scale
+            function obliqueProject(x, y, z) {
+                // Apply 0.5 scaling to z (Depth)
+                const z_scaled = z * OBLIQUE_SCALE_FACTOR; 
+                
+                // Front face is flat (x, y). Z component adds (-z * cos45, -z * sin45) for Up-Left recession.
+                const finalX = originX + x * scale - (z_scaled * Math.cos(angleRad) * scale); // Recedes LEFT
+                const finalY = baseY - y * scale - (z_scaled * Math.sin(angleRad) * scale); // Recedes UP
+                return { x: finalX, y: finalY };
+            }
+
+            // Vertices
+            // Front Face (z=0)
+            const p0 = obliqueProject(0, 0, 0);     // Bottom Right
+            const p1 = obliqueProject(L, 0, 0);     // Bottom Left
+            const p2 = obliqueProject(L, H, 0);     // Top Left
+            const p3 = obliqueProject(0, H, 0);     // Top Right
+            
+            // Back Face (z=D)
+            const p4 = obliqueProject(0, 0, D);     // Bottom Right Back
+            const p5 = obliqueProject(L, 0, D);     // Bottom Left Back
+            const p6 = obliqueProject(L, H, D);     // Top Left Back
+            const p7 = obliqueProject(0, H, D);     // Top Right Back
+
+            ctx.lineWidth = 2.5;
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#333';
+
+            // 1. Draw Front Face (Always visible)
+            ctx.beginPath();
+            ctx.moveTo(p0.x, p0.y);
+            ctx.lineTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.lineTo(p3.x, p3.y);
+            ctx.closePath();
+            ctx.stroke();
+
+            // 2. Draw Visible Connecting Lines (Depth)
+            ctx.beginPath();
+            ctx.moveTo(p3.x, p3.y); ctx.lineTo(p7.x, p7.y); // Top Right corner
+            ctx.moveTo(p0.x, p0.y); ctx.lineTo(p4.x, p4.y); // Bottom Right corner
+            ctx.moveTo(p2.x, p2.y); ctx.lineTo(p6.x, p6.y); // Top Left corner
+            ctx.stroke();
+
+            // 3. Draw Back Face Visible Lines (Top and Right)
+            ctx.beginPath();
+            ctx.moveTo(p6.x, p6.y); ctx.lineTo(p7.x, p7.y); // Top Edge
+            ctx.moveTo(p7.x, p7.y); ctx.lineTo(p4.x, p4.y); // Right Edge
+            ctx.stroke();
+
+            // 4. Hidden Lines (Dashed)
+            ctx.save();
+            ctx.setLineDash([5, 5]);
+            ctx.strokeStyle = '#aaa';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            // Back Bottom-Left corner (p5) connects to p1, p4, p6
+            ctx.moveTo(p1.x, p1.y); ctx.lineTo(p5.x, p5.y);
+            ctx.moveTo(p5.x, p5.y); ctx.lineTo(p4.x, p4.y);
+            ctx.moveTo(p5.x, p5.y); ctx.lineTo(p6.x, p6.y);
+            ctx.stroke();
+            ctx.restore();
+
+            // 5. Dimensions
+            const offset = 25;
+            // L and H are full scale, D is real dimension but should show D/5 squares
+            const L_squares = L / GRID_SIZE;
+            const D_squares = D / GRID_SIZE; // Real count
+            const H_squares = H / GRID_SIZE;
+            
+            // Length (L) - Horizontal below
+            drawArrow(ctx, p1.x, p1.y + offset, p0.x, p0.y + offset, L, L_squares);
+            
+            // Height (H) - Vertical right
+            drawArrow(ctx, p0.x + offset, p0.y, p3.x + offset, p3.y, H, H_squares, true); // true for vertical
+            
+            // Dimension/Depth (D) - Angled 45 deg
+            const dOffset = 15;
+            // The extension lines must be drawn from the points p0 and p4 
+            // The length of the dimension line is proportional to D_scaled.
+            const dStart = { x: p0.x + dOffset * Math.cos(angleRad), y: p0.y - dOffset * Math.sin(angleRad) }; 
+            const dEnd = { x: p4.x + dOffset * Math.cos(angleRad), y: p4.y - dOffset * Math.sin(angleRad) };
+            
+            // IMPORTANT: The number of squares shown for D in oblique must be D_real / GRID_SIZE
+            drawArrow(ctx, dStart.x, dStart.y, dEnd.x, dEnd.y, D, D_squares);
+        }
+
+        // --- Grid Drawing Function (For Orthographic View - 5mm Steps) ---
+        function drawOrthographicGrid(ctx, scale, L, D, H, origins) {
+            ctx.save();
+            ctx.strokeStyle = '#DCDCDC'; /* Changed to a slightly darker gray */
+            ctx.lineWidth = 0.5;
+            const step = GRID_SIZE * scale; // Pixel distance for 5mm
+
+            const { frontX, frontY, sideX, sideY, topX, topY } = origins;
+
+            // Front View Grid (L x H)
+            for (let i = 0; i <= L; i += GRID_SIZE) {
+                ctx.beginPath();
+                ctx.moveTo(frontX + i * scale, frontY);
+                ctx.lineTo(frontX + i * scale, frontY + H * scale);
+                ctx.stroke();
+            }
+            for (let j = 0; j <= H; j += GRID_SIZE) {
+                ctx.beginPath();
+                ctx.moveTo(frontX, frontY + j * scale);
+                ctx.lineTo(frontX + L * scale, frontY + j * scale);
+                ctx.stroke();
+            }
+
+            // Side View Grid (D x H)
+            for (let i = 0; i <= D; i += GRID_SIZE) {
+                ctx.beginPath();
+                ctx.moveTo(sideX + i * scale, sideY);
+                ctx.lineTo(sideX + i * scale, sideY + H * scale);
+                ctx.stroke();
+            }
+            for (let j = 0; j <= H; j += GRID_SIZE) {
+                ctx.beginPath();
+                ctx.moveTo(sideX, sideY + j * scale);
+                ctx.lineTo(sideX + D * scale, sideY + j * scale);
+                ctx.stroke();
+            }
+
+            // Top View Grid (L x D)
+            for (let i = 0; i <= L; i += GRID_SIZE) {
+                ctx.beginPath();
+                ctx.moveTo(topX + i * scale, topY);
+                ctx.lineTo(topX + i * scale, topY + D * scale);
+                ctx.stroke();
+            }
+            for (let j = 0; j <= D; j += GRID_SIZE) {
+                ctx.beginPath();
+                ctx.moveTo(topX, topY + j * scale);
+                ctx.lineTo(topX + L * scale, topY + j * scale);
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        // --- Orthographic Drawing Logic (First Angle Projection - Side on Right) ---
+        function drawOrthographic(L, D, H) {
+            clearCanvas(orthoCanvas, orthoCtx);
+            const ctx = orthoCtx;
+
+            const padding = 60;
+            // Gap reduced to 20mm (20)
+            const gap = 20; 
+            
+            // Total dimensions needed
+            const totalWidth = L + gap + D;
+            const totalHeight = H + gap + D;
+            
+            const scale = Math.min(
+                (orthoCanvas.width - padding*2) / totalWidth,
+                (orthoCanvas.height - padding*2) / totalHeight
+            );
+
+            // Origins (Top-Left corner of each view)
+            const frontX = padding;
+            const frontY = padding;
+            
+            const sideX = frontX + (L * scale) + (gap * scale); // L + Gap
+            const sideY = frontY;
+            
+            const topX = frontX;
+            const topY = frontY + (H * scale) + (gap * scale); // H + Gap
+            
+            const cornerX = frontX + L * scale;
+            const cornerY = frontY + H * scale;
+
+            const origins = { frontX, frontY, sideX, sideY, topX, topY };
+            
+            // Draw the 5mm Grid (MUST be before fill)
+            drawOrthographicGrid(ctx, scale, L, D, H, origins);
+
+
+            ctx.lineWidth = 2;
+            
+            // 1. Draw Front View (L x H) - FILLED RED
+            ctx.fillStyle = RED + '33'; // 20% opacity
+            ctx.fillRect(frontX, frontY, L * scale, H * scale);
+            ctx.strokeStyle = RED;
+            ctx.strokeRect(frontX, frontY, L * scale, H * scale);
+            drawLabel(ctx, frontX + (L*scale)/2, frontY - 25, "نمای روبرو (Front)", RED);
+            
+            // 2. Draw Side View (D x H) - FILLED YELLOW
+            ctx.fillStyle = YELLOW + '33'; // 20% opacity
+            ctx.fillRect(sideX, sideY, D * scale, H * scale);
+            ctx.strokeStyle = YELLOW;
+            ctx.strokeRect(sideX, sideY, D * scale, H * scale);
+            drawLabel(ctx, sideX + (D*scale)/2, sideY - 25, "نمای جانبی (Side)", YELLOW);
+            
+            // 3. Draw Top View (L x D) - FILLED BLUE
+            ctx.fillStyle = BLUE + '33'; // 20% opacity
+            ctx.fillRect(topX, topY, L * scale, D * scale);
+            ctx.strokeStyle = BLUE;
+            ctx.strokeRect(topX, topY, L * scale, D * scale);
+            drawLabel(ctx, topX + (L*scale)/2, topY + D*scale + 25, "نمای بالا (Top)", BLUE);
+            
+            // Reset stroke color for projection lines
+            ctx.strokeStyle = '#333';
+            
+            // Dimensions
+            const L_squares = L / GRID_SIZE;
+            const D_squares = D / GRID_SIZE;
+            const H_squares = H / GRID_SIZE;
+            
+            // Dimensions for Front
+            drawArrow(ctx, frontX, frontY + H*scale + 10, frontX + L*scale, frontY + H*scale + 10, L, L_squares); 
+            drawArrow(ctx, frontX - 10, frontY, frontX - 10, frontY + H*scale, H, H_squares, true); 
+
+            // Dimensions for Side (Depth)
+            drawArrow(ctx, sideX, sideY + H*scale + 10, sideX + D*scale, sideY + H*scale + 10, D, D_squares); 
+            
+            // Dimensions for Top (Depth)
+            drawArrow(ctx, topX + L*scale + 10, topY, topX + L*scale + 10, topY + D*scale, D, D_squares, true); 
+
+
+            // Projection Lines
+            ctx.save();
+            ctx.strokeStyle = '#999';
+            ctx.setLineDash([4, 4]);
+            ctx.lineWidth = 1;
+            
+            // Front to Side (Horizontal alignment)
+            // Use the edges of the Front and Side views to ensure the lines hit the right points
+            ctx.beginPath();
+            ctx.moveTo(frontX + L*scale, frontY); ctx.lineTo(sideX, sideY);
+            ctx.moveTo(frontX + L*scale, frontY + H*scale); ctx.lineTo(sideX, sideY + H*scale);
+            ctx.stroke();
+            
+            // Front to Top (Vertical alignment)
+            // Use the edges of the Front and Top views to ensure the lines hit the right points
+            ctx.beginPath();
+            ctx.moveTo(frontX, frontY + H*scale); ctx.lineTo(topX, topY);
+            ctx.moveTo(frontX + L*scale, frontY + H*scale); ctx.lineTo(topX + L*scale, topY);
+            ctx.stroke();
+            
+            // Side to Top (45 degree projection via corner)
+            
+            // Miter Line (45 degree) - Corrected to extend fully
+            ctx.strokeStyle = '#666';
+            ctx.setLineDash([]);
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            
+            // Corner of Projection Area
+            // The corner where front/side/top projections meet (end of L and H)
+            const projectionCornerX = cornerX + gap * scale;
+            const projectionCornerY = cornerY + gap * scale;
+            
+            // Calculate the length needed to extend the line beyond the D-boundaries of Top/Side views
+            // The miter line must cover the distance from cornerX to sideX (which is L + gap + D) 
+            // and from cornerY to topY + D*scale (which is H + gap + D)
+            
+            // Line starts at the corner of Front/Top/Side view lines, and extends to the opposite corner of the projection zone.
+            
+            // The line segment for projection is from (cornerX, cornerY) to (projectionCornerX, projectionCornerY)
+            // It should extend fully from the X-axis projection (cornerX) to the Y-axis projection (cornerY)
+            
+            // Let's ensure it starts exactly at the corner (cornerX, cornerY)
+            ctx.moveTo(cornerX, cornerY);
+            
+            // And extends exactly to the intersection of the Top View's bottom edge projection 
+            // and the Side View's right edge projection.
+            // The necessary distance is D*scale
+            const miterEnd = { 
+                x: cornerX + D * scale + gap * scale, 
+                y: cornerY + D * scale + gap * scale
+            };
+            
+            ctx.lineTo(miterEnd.x, miterEnd.y);
+            ctx.stroke();
+
+            
+            // Projection lines from Side to Miter Line (Horizontal)
+            ctx.setLineDash([4, 4]);
+            ctx.strokeStyle = '#999';
+            ctx.lineWidth = 1;
+            
+            // Projection from Side View to Miter Line
+            for(let i = 0; i <= D; i += GRID_SIZE) {
+                const y = sideY + i * scale;
+                ctx.beginPath();
+                // Draw horizontal line from Side View (x=sideX) to the intersection line (x=cornerX + gap*scale)
+                ctx.moveTo(sideX, y);
+                ctx.lineTo(cornerX + gap * scale, y);
+                ctx.stroke();
+
+                // Calculate the intersection point on the 45 deg Miter line
+                // The 45 deg line means x = y + constant. If we use (cornerX, cornerY) as reference
+                // y - cornerY = x - cornerX. So x = cornerX + (y - cornerY).
+                const x_miter = cornerX + (y - cornerY); 
+                
+                // Projection lines from Miter Line down to Top View (Vertical)
+                if (x_miter >= cornerX && x_miter <= miterEnd.x) {
+                    ctx.beginPath();
+                    ctx.moveTo(x_miter, y);
+                    ctx.lineTo(x_miter, topY); // Project down to the Top View's top edge
+                    ctx.stroke();
+                }
+            }
+
+
+            ctx.restore();
+        }
+
+        function drawLabel(ctx, x, y, text, color) {
+            ctx.fillStyle = color || '#333';
+            ctx.font = 'bold 14px Vazir';
+            ctx.textAlign = 'center';
+            ctx.fillText(text, x, y);
+        }
+        
+    </script>
+</body>
+</html>
