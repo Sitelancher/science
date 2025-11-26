@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مبدل درصد حرفه‌ای | مهندس رستگاری مهر</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Vazirmatn Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Modern Gradient Palette */
+            --primary-gradient: linear-gradient(135deg, #4285F4 0%, #3B71CA 100%);
+            --secondary-gradient: linear-gradient(135deg, #34A853 0%, #2E8B46 100%);
+            --accent-gradient: linear-gradient(135deg, #FBBC05 0%, #F5B400 100%);
+            --danger-gradient: linear-gradient(135deg, #EA4335 0%, #C5221F 100%);
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --white: #FFFFFF;
+            
+            --card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* --- Header Styles --- */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        .logo-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .logo-icon {
+            font-size: 3rem;
+            color: var(--white);
+            background: var(--primary-gradient);
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-shadow: 0 10px 25px rgba(66, 133, 244, 0.4);
+            margin: 0 auto;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        /* --- Navigation Tabs --- */
+        .tabs-container {
+            background: var(--white);
+            padding: 10px;
+            border-radius: 50px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            background: rgba(66, 133, 244, 0.1);
+            color: #4285F4;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-gradient);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* --- Main Content Area --- */
+        .content-area {
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 40px;
+        }
+
+        .tab-content {
+            display: none;
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            box-shadow: var(--card-shadow);
+            animation: fadeIn 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Decorative Background Blob */
+        .tab-content::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: -50px;
+            width: 150px;
+            height: 150px;
+            background: var(--primary-gradient);
+            opacity: 0.05;
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--text-main);
+            margin-bottom: 25px;
+            font-weight: 900;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h2 i {
+            color: #4285F4;
+        }
+
+        /* --- Form Elements --- */
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+            position: relative;
+            z-index: 1;
+        }
+
+        @media (min-width: 768px) {
+            .calculator-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 700;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #E5E7EB;
+            border-radius: var(--radius-md);
+            font-size: 1.1rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            background: #F9FAFB;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        input:focus, select:focus {
+            border-color: #4285F4;
+            background: #fff;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(66, 133, 244, 0.15);
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1.1rem;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary { background: var(--primary-gradient); }
+        .btn-success { background: var(--secondary-gradient); }
+        .btn-warning { background: var(--accent-gradient); color: #000; }
+        .btn-danger { background: var(--danger-gradient); }
+
+        /* --- Result Box --- */
+        .result-box {
+            background: #F3F4F6;
+            border-radius: var(--radius-md);
+            padding: 25px;
+            text-align: center;
+            border: 2px dashed #D1D5DB;
+            margin-top: 10px;
+            display: none;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .result-box.show {
+            display: block;
+        }
+
+        .result-title {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .result-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #4285F4;
+            margin-bottom: 5px;
+        }
+
+        /* --- Educational Section Styles --- */
+        .edu-card {
+            background: #F9FAFB;
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-right: 4px solid #4285F4;
+        }
+
+        .edu-title {
+            font-weight: 900;
+            color: #1F2937;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .edu-desc {
+            color: #4B5563;
+            line-height: 1.8;
+            font-size: 0.95rem;
+        }
+
+        .visual-bar-container {
+            width: 100%;
+            height: 24px;
+            background: #E5E7EB;
+            border-radius: 12px;
+            margin-top: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .visual-bar-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            width: 0%;
+            transition: width 1s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* --- Footer & Author --- */
+        .footer-author {
+            margin-top: auto;
+            text-align: center;
+            padding: 30px;
+            background: var(--white);
+            width: 100%;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+            border-top: 1px solid #eee;
+        }
+
+        .author-card {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .author-btn {
+            background: var(--text-main);
+            color: var(--white);
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .author-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            background: #000;
+        }
+
+        /* --- Comparison Grid --- */
+        .comparison-grid {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .comparison-item {
+            flex: 1;
+            min-width: 150px;
+            background: white;
+            padding: 20px;
+            border-radius: var(--radius-md);
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .comparison-item.winner {
+            border-color: #34A853;
+            background: #F0FDF4;
+            transform: scale(1.05);
+        }
+
+        .remove-btn {
+            background: #FFEBEE;
+            color: #D32F2F;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        
+        .remove-btn:hover {
+            background: #FFCDD2;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; }
+            .tab-btn span { display: none; }
+            .tab-btn i { font-size: 1.2rem; margin: 0; }
+            .tabs-container { gap: 5px; }
+            .tab-btn { padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <div class="logo-icon">
+                <i class="fas fa-percentage"></i>
+            </div>
+        </div>
+        <h1>مبدل درصد حرفه‌ای</h1>
+        <p class="subtitle">محاسبات دقیق، طراحی مدرن، یادگیری آسان</p>
+    </header>
+
+    <div class="tabs-container">
+        <button class="tab-btn active" onclick="switchTab('fraction')">
+            <i class="fas fa-divide"></i>
+            <span>کسر به درصد</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('decimal')">
+            <i class="fas fa-calculator"></i>
+            <span>ممیز و درصد</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('find-number')">
+            <i class="fas fa-search-dollar"></i>
+            <span>عدد اصلی</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('discount')">
+            <i class="fas fa-tags"></i>
+            <span>تخفیف</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('education')">
+            <i class="fas fa-graduation-cap"></i>
+            <span>آموزش درصد</span>
+        </button>
+    </div>
+
+    <div class="content-area">
+        
+        <!-- Tab 1: Fraction -->
+        <div id="fraction" class="tab-content active">
+            <h2><i class="fas fa-divide"></i> تبدیل کسر به درصد</h2>
+            <div class="calculator-grid">
+                <div>
+                    <div class="input-group">
+                        <label>صورت کسر (عدد بالا)</label>
+                        <input type="number" id="numerator" placeholder="مثال: 3">
+                    </div>
+                    <div class="input-group">
+                        <label>مخرج کسر (عدد پایین)</label>
+                        <input type="number" id="denominator" placeholder="مثال: 4">
+                    </div>
+                    <button class="btn btn-primary" onclick="calcFraction()">
+                        محاسبه کن <i class="fas fa-arrow-left"></i>
+                    </button>
+                </div>
+                <div>
+                    <div class="result-box" id="res-fraction">
+                        <div class="result-title">نتیجه نهایی</div>
+                        <div class="result-value" id="val-fraction">0%</div>
+                        <div class="visual-bar-container">
+                            <div class="visual-bar-fill" id="bar-fraction" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Decimal -->
+        <div id="decimal" class="tab-content">
+            <h2><i class="fas fa-calculator"></i> تبدیل ممیز و درصد</h2>
+            <div class="calculator-grid">
+                <div>
+                    <div class="input-group">
+                        <label>عدد یا درصد را وارد کنید</label>
+                        <input type="text" id="decimal-input" placeholder="مثال: 0.75 یا 75%">
+                    </div>
+                    <div class="input-group">
+                        <label>نوع تبدیل</label>
+                        <select id="conversion-type">
+                            <option value="to-percent">تبدیل عدد اعشاری به درصد</option>
+                            <option value="from-percent">تبدیل درصد به عدد اعشاری</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-success" onclick="calcDecimal()">
+                        تبدیل کن <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <div class="result-box" id="res-decimal">
+                    <div class="result-title">مقدار تبدیل شده</div>
+                    <div class="result-value" id="val-decimal">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Find Number -->
+        <div id="find-number" class="tab-content">
+            <h2><i class="fas fa-search"></i> پیدا کردن عدد اصلی</h2>
+            <p style="margin-bottom: 20px; color: #666;">وقتی می‌دانید مقداری از یک عدد چقدر است، کل عدد را پیدا کنید.</p>
+            <div class="calculator-grid">
+                <div>
+                    <div class="input-group">
+                        <label>چند درصد؟</label>
+                        <input type="number" id="fn-percent" placeholder="مثال: 20">
+                    </div>
+                    <div class="input-group">
+                        <label>برابر است با چه عددی؟</label>
+                        <input type="number" id="fn-value" placeholder="مثال: 50">
+                    </div>
+                    <button class="btn btn-warning" onclick="calcFindNumber()">
+                        پیدا کردن کل <i class="fas fa-bullseye"></i>
+                    </button>
+                </div>
+                <div class="result-box" id="res-find">
+                    <div class="result-title">عدد اصلی (100٪)</div>
+                    <div class="result-value" id="val-find">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 4: Discount -->
+        <div id="discount" class="tab-content">
+            <h2><i class="fas fa-tags"></i> مقایسه تخفیف‌ها</h2>
+            <div class="input-group">
+                <label>قیمت اصلی کالا (تومان/دلار)</label>
+                <input type="number" id="disc-price" placeholder="مثال: 100000">
+            </div>
+            
+            <div id="discount-list">
+                <div class="input-group" style="display: flex; gap: 10px; align-items: center;">
+                    <input type="number" class="disc-percent" placeholder="درصد تخفیف اول (مثال: 20)">
+                </div>
+                <div class="input-group" style="display: flex; gap: 10px; align-items: center;">
+                    <input type="number" class="disc-percent" placeholder="درصد تخفیف دوم (مثال: 25)">
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button class="btn btn-primary" onclick="addDiscountField()" style="flex:1; background: #E5E7EB; color: #333;">+ افزودن گزینه</button>
+                <button class="btn btn-danger" onclick="compareDiscounts()" style="flex:2;">مقایسه و محاسبه</button>
+            </div>
+
+            <div class="comparison-grid" id="disc-results"></div>
+        </div>
+
+        <!-- Tab 5: Education (New) -->
+        <div id="education" class="tab-content">
+            <h2><i class="fas fa-graduation-cap"></i> آموزش مفاهیم درصد</h2>
+            
+            <div class="edu-card">
+                <div class="edu-title">درصد چیست؟</div>
+                <div class="edu-desc">
+                    درصد (Percent) یعنی "به ازای هر ۱۰۰ تا". وقتی می‌گوییم ۵۰٪، یعنی ۵۰ تا از هر ۱۰۰ تا.
+                    <br>
+                    علامت ریاضی آن <strong>%</strong> است.
+                </div>
+                <div class="visual-bar-container">
+                    <div class="visual-bar-fill" style="width: 50%;">50%</div>
+                </div>
+            </div>
+
+            <div class="edu-card">
+                <div class="edu-title">فرمول تبدیل کسر به درصد</div>
+                <div class="edu-desc">
+                    برای تبدیل یک کسر به درصد، کافیست صورت را بر مخرج تقسیم کنید و سپس در ۱۰۰ ضرب کنید.
+                    <br><br>
+                    <code>(صورت ÷ مخرج) × ۱۰۰ = درصد</code>
+                </div>
+            </div>
+
+            <div class="edu-card">
+                <div class="edu-title">محاسبه تخفیف</div>
+                <div class="edu-desc">
+                    برای فهمیدن قیمت نهایی با تخفیف:
+                    <ol style="margin-right: 20px; margin-top: 10px;">
+                        <li>مبلغ تخفیف = قیمت اصلی × (درصد تخفیف ÷ ۱۰۰)</li>
+                        <li>قیمت نهایی = قیمت اصلی - مبلغ تخفیف</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer with Developer Link -->
+    <footer class="footer-author">
+        <div class="author-card">
+            <p style="font-weight: 700; color: #4B5563; margin-bottom: 15px;">طراحی و توسعه توسط</p>
+            <a href="https://rama-company.github.io/aliakbar/" target="_blank" class="author-btn">
+                <i class="fas fa-user-circle"></i>
+                مهندس علی اکبر رستگاری مهر
+                <i class="fas fa-external-link-alt" style="font-size: 0.8rem;"></i>
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        // --- Navigation Logic ---
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.remove('active');
+            });
+            // Deactivate all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show target tab
+            document.getElementById(tabId).classList.add('active');
+            // Activate target button (finding by onclick attribute for simplicity in this structure)
+            const btns = document.querySelectorAll('.tab-btn');
+            btns.forEach(btn => {
+                if(btn.getAttribute('onclick').includes(tabId)) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        // --- Fraction Logic ---
+        function calcFraction() {
+            const num = parseFloat(document.getElementById('numerator').value);
+            const den = parseFloat(document.getElementById('denominator').value);
+            const resBox = document.getElementById('res-fraction');
+            
+            if (!num || !den || den === 0) {
+                alert('لطفاً اعداد معتبر وارد کنید (مخرج نباید صفر باشد)');
+                return;
+            }
+
+            const percent = (num / den) * 100;
+            const displayVal = Number.isInteger(percent) ? percent : percent.toFixed(2);
+            
+            document.getElementById('val-fraction').innerText = displayVal + '%';
+            document.getElementById('bar-fraction').style.width = Math.min(percent, 100) + '%';
+            document.getElementById('bar-fraction').innerText = displayVal + '%';
+            
+            resBox.classList.add('show');
+        }
+
+        // --- Decimal Logic ---
+        function calcDecimal() {
+            const input = document.getElementById('decimal-input').value.trim();
+            const type = document.getElementById('conversion-type').value;
+            const resBox = document.getElementById('res-decimal');
+            let result = 0;
+
+            if (!input) return;
+
+            if (type === 'to-percent') {
+                const val = parseFloat(input);
+                result = (val * 100).toFixed(2) + '%';
+            } else {
+                let val = parseFloat(input.replace('%', ''));
+                result = (val / 100).toFixed(4);
+            }
+
+            document.getElementById('val-decimal').innerText = result;
+            resBox.classList.add('show');
+        }
+
+        // --- Find Number Logic ---
+        function calcFindNumber() {
+            const percent = parseFloat(document.getElementById('fn-percent').value);
+            const value = parseFloat(document.getElementById('fn-value').value);
+            const resBox = document.getElementById('res-find');
+
+            if (!percent || !value) return;
+
+            const original = (value / percent) * 100;
+            document.getElementById('val-find').innerText = original.toFixed(2);
+            resBox.classList.add('show');
+        }
+
+        // --- Discount Logic ---
+        function addDiscountField() {
+            const container = document.getElementById('discount-list');
+            const div = document.createElement('div');
+            div.className = 'input-group';
+            div.style.display = 'flex';
+            div.style.gap = '10px';
+            div.style.alignItems = 'center';
+            div.innerHTML = `
+                <input type="number" class="disc-percent" placeholder="درصد تخفیف جدید">
+                <button class="remove-btn" onclick="this.parentElement.remove()">×</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function compareDiscounts() {
+            const price = parseFloat(document.getElementById('disc-price').value);
+            const inputs = document.querySelectorAll('.disc-percent');
+            const resultsContainer = document.getElementById('disc-results');
+            resultsContainer.innerHTML = ''; // Clear previous
+
+            if (!price) {
+                alert('لطفاً قیمت اصلی را وارد کنید');
+                return;
+            }
+
+            let bestPrice = Infinity;
+            let bestIndex = -1;
+            let calculations = [];
+
+            inputs.forEach((input, index) => {
+                const percent = parseFloat(input.value);
+                if (!isNaN(percent)) {
+                    const discountAmount = price * (percent / 100);
+                    const finalPrice = price - discountAmount;
+                    
+                    if (finalPrice < bestPrice) {
+                        bestPrice = finalPrice;
+                        bestIndex = index;
+                    }
+
+                    calculations.push({
+                        percent: percent,
+                        final: finalPrice,
+                        saved: discountAmount
+                    });
+                }
+            });
+
+            calculations.forEach((calc, idx) => {
+                const isWinner = (idx === bestIndex);
+                const div = document.createElement('div');
+                div.className = `comparison-item ${isWinner ? 'winner' : ''}`;
+                div.innerHTML = `
+                    <div style="font-size: 1.5rem; font-weight:900; color: ${isWinner ? '#34A853' : '#666'}">${calc.percent}%</div>
+                    <div style="font-size: 0.9rem; margin: 10px 0;">قیمت نهایی:</div>
+                    <div style="font-size: 1.2rem; font-weight:bold;">${calc.final.toLocaleString()}</div>
+                    <div style="font-size: 0.8rem; color: #4285F4; margin-top: 5px;">سود شما: ${calc.saved.toLocaleString()}</div>
+                    ${isWinner ? '<div style="margin-top:10px; color:#34A853; font-weight:bold;">بهترین گزینه!</div>' : ''}
+                `;
+                resultsContainer.appendChild(div);
+            });
+        }
+    </script>
+</body>
+</html>
